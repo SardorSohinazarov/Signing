@@ -10,7 +10,10 @@ namespace SigningAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
-            return Ok("Loginned successfully");
+            return Ok(new
+            {
+                Message = "Loginned successfully"
+            });
         }
 
         [HttpPost]
