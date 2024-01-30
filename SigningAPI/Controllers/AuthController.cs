@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SigningAPI.Data;
 using SigningAPI.Entities;
@@ -73,5 +74,10 @@ namespace SigningAPI.Controllers
                 Message = "Registred successfully"
             });
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAllUsers()
+            => Ok(await _context.Users.ToListAsync());
     }
 }

@@ -8,6 +8,13 @@ namespace SigningAPI.Services
 {
     public class AuthService
     {
+        private readonly IConfiguration _configuration;
+
+        public AuthService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public async Task<string> GenerateToken(User user)
         {
             /* var roles = user.Roles;
@@ -32,17 +39,16 @@ namespace SigningAPI.Services
             };
 
             var signingCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(
-                    key: Encoding.UTF8.GetBytes("Mening-JWt-Keyim-Shu-Mana-Shu-Edi,O'zingiz-yaxshimi-ishlar-bolyaptimi?")),
+                    key: new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"])),
                     algorithm: SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: "Issuer",
-                audience: "Audience",
+                issuer: _configuration["JWT:Issuer"],
+                audience: _configuration["JWT:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(5),
-                signingCredentials: signingCredentials
-                );
+                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["JWT:ExpireInMinutes"])),
+                signingCredentials: signingCredentials);
+
 
             var accesToken = new JwtSecurityTokenHandler().WriteToken(token);
             return accesToken;
