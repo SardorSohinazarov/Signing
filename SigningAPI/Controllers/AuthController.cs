@@ -4,6 +4,7 @@ using SigningAPI.Data;
 using SigningAPI.Entities;
 using SigningAPI.Helpers;
 using SigningAPI.Models;
+using SigningAPI.Services;
 
 namespace SigningAPI.Controllers
 {
@@ -13,23 +14,30 @@ namespace SigningAPI.Controllers
     {
         private readonly IPasswordHasher _passwordHasher;
         private readonly ApplicationDbContext _context;
+        private readonly AuthService _authService;
 
-        public AuthController(IPasswordHasher passwordHasher, ApplicationDbContext context)
+        public AuthController(IPasswordHasher passwordHasher, ApplicationDbContext context, AuthService authService)
         {
             _passwordHasher = passwordHasher;
             _context = context;
+            _authService = authService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
             var storedUser = await _context.Users.FirstOrDefaultAsync(x
-                => x.Email == loginDTO.Email
-                && x.PasswordHash == _passwordHasher.Encrypt(loginDTO.Password, x.Salt));
+                => x.Email == loginDTO.Email);
+
+            if (storedUser.PasswordHash == _passwordHasher.Encrypt(loginDTO.Password, storedUser.Salt))
+            {
+
+            }
 
             if (storedUser == null) { /*Register bo'lmagan didi*/ }
             return Ok(new
             {
+                Token = await _authService.GenerateToken(storedUser),
                 Message = "Loginned successfully"
             });
         }
@@ -50,12 +58,20 @@ namespace SigningAPI.Controllers
                 TokenExpireTime = DateTime.Now.AddDays(1),
             };
 
+
             if (registerDTO.Roles is not null)
             {
                 //rollarini topib kelib qo'shadi
             }
 
-            return Ok("Registred successfully");
+            var entry = await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                Token = await _authService.GenerateToken(entry.Entity),
+                Message = "Registred successfully"
+            });
         }
     }
 }

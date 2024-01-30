@@ -1,6 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using SigningAPI.Entities;
-using SigningAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,7 +8,7 @@ namespace SigningAPI.Services
 {
     public class AuthService
     {
-        public async Task<TokenDTO> GenerateToken(User user)
+        public async Task<string> GenerateToken(User user)
         {
             /* var roles = user.Roles;
              var persmissions = roles.SelectMany(x => x.Permissions);
@@ -34,7 +33,7 @@ namespace SigningAPI.Services
 
             var signingCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(
-                    key: Encoding.UTF8.GetBytes("Mening-JWt-Keyim-She-Edi")),
+                    key: Encoding.UTF8.GetBytes("Mening-JWt-Keyim-Shu-Mana-Shu-Edi,O'zingiz-yaxshimi-ishlar-bolyaptimi?")),
                     algorithm: SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -46,13 +45,7 @@ namespace SigningAPI.Services
                 );
 
             var accesToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return new TokenDTO()
-            {
-                RefreshToken = user.RefreshToken,
-                AccessToken = accesToken,
-                ExpireDate = DateTime.Now.AddDays(1),
-            };
+            return accesToken;
         }
     }
 }
