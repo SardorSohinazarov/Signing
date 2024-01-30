@@ -35,7 +35,7 @@ namespace SigningAPI.Services
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-                new Claim(ClaimTypes.Email,user.Email.ToString())
+                new Claim("Email",user.Email.ToString())
             };
 
             var signingCredentials = new SigningCredentials(
