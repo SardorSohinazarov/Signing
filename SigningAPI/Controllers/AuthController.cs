@@ -36,9 +36,12 @@ namespace SigningAPI.Controllers
             }
 
             if (storedUser == null) { /*Register bo'lmagan didi*/ }
+
             return Ok(new
             {
-                Token = await _authService.GenerateToken(storedUser),
+                AccessToken = await _authService.GenerateToken(storedUser),
+                RefreshToken = storedUser.RefreshToken,
+                ExpireDate = DateTime.Now.AddDays(10),
                 Message = "Loginned successfully"
             });
         }
@@ -70,9 +73,17 @@ namespace SigningAPI.Controllers
 
             return Ok(new
             {
-                Token = await _authService.GenerateToken(entry.Entity),
-                Message = "Registred successfully"
+                AccessToken = await _authService.GenerateToken(entry.Entity),
+                RefreshToken = entry.Entity.RefreshToken,
+                ExpireDate = DateTime.Now.AddDays(10),
+                Message = "Registered successfully"
             });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RefreshTokenAsync(TokenDTOForCreation tokenDTO)
+        {
+            return Ok(await _authService.RefreshToken(tokenDTO));
         }
 
         [HttpGet]
